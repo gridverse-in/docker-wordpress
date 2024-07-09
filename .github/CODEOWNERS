@@ -4,10 +4,11 @@
 # Order is important: the last matching pattern has the highest precedence
 
 # These owners will be the default owners for everything
-*                                        @gridverse-in/admins
-
-*                                        @gridverse-in/engineering
+*                                        @gridverse-in/admins  @gridverse-in/engineering
 .github/CODEOWNERS
 .github/workflows/*.yml
+
+.github/CODEOWNERS                       @gridverse-in/admins
+.github/workflows/*.yml                  @gridverse-in/admins
 
 *.md                                     @gridverse-in/docs
