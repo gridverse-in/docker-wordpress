@@ -1,0 +1,47 @@
+# Ignore files and directories commonly excluded in Docker images
+
+# Ignore version control files
+.git
+.svn
+
+# Ignore build artifacts
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.exe
+*.pdb
+*.class
+*.jar
+*.war
+*.ear
+
+# Ignore package manager directories
+node_modules/
+vendor/
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.cache
+
+# Ignore system and hidden files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Ignore user-specific files
+*.iml
+.idea/
+.vscode/
+
+# Ignore documentation and test files
+docs/
+test/
+tests/

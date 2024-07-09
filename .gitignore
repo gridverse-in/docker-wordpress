@@ -1,0 +1,36 @@
+
+# Ignore editor and IDE files
+.vscode/
+.idea/
+
+# Ignore build artifacts
+*.log
+*.tmp
+*.bak
+
+# Ignore Docker-related files
+.dockerenv
+
+
+# Ignore Docker image and container files
+*.tar
+*.gz
+*.zip
+*.xz
+*.bz2
+*.7z
+*.rar
+*.iso
+*.img
+*.vmdk
+*.ova
+*.ovf
+
+# Ignore Docker cache files
+.docker/
+
+# Ignore Docker Compose files
+docker-compose.yml
+docker-compose.yaml
+docker-compose.override.yml
+docker-compose.override.yaml
