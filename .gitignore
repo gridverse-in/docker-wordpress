@@ -12,19 +12,9 @@
 .dockerenv
 
 
-# Ignore Docker image and container files
-*.tar
-*.gz
-*.zip
-*.xz
-*.bz2
-*.7z
-*.rar
-*.iso
-*.img
-*.vmdk
-*.ova
-*.ovf
+# Tools
+.build-harness
+build-harness/
 
 # Ignore Docker cache files
 .docker/
