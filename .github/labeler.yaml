@@ -1,0 +1,12 @@
+image:
+  - Dockerfile
+
+docs:
+  - docs/**
+  - README.md
+
+automation:
+  - .github/**
+  - Makefile
+  - .pre-commit-config.yaml
+

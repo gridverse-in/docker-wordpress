@@ -1,0 +1,93 @@
+name: build test scan docker images
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+    paths:
+      - components/**
+
+env:
+  DOCKERFILE_PATH: "."
+  DOCKERFILE_TAG: ${{ github.event.pull_request.head.sha }}
+  REGISTRY_PATH: gcr.io/gridverse-in/wordpress
+  REGISTRY_TYPE: "gcr.io" # If not set then will default to Docker Hub
+  REGISTRY_USERNAME: ${{ github.actor }}
+
+jobs:
+  buildtestscan:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2.2.1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3.2.0
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ env.DOCKERFILE_TAG }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Login to registry "${{ env.REGISTRY_TYPE }}"
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ${{ env.REGISTRY_TYPE }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3.2.0
+        with:
+          context: "${{ env.DOCKERFILE_PATH }}"
+          push: true
+          tags: "${{ env.REGISTRY_PATH }}:${{ env.DOCKERFILE_TAG }}"
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      - name: Run Checkov action
+        id: checkov
+        uses: bridgecrewio/checkov-action@v12.1347.0
+        with:
+          quiet: true # optional: display only failed checks
+          soft_fail: true # optional: do not return an error code if there are failed checks
+          framework: dockerfile
+          output_format: cli,sarif
+          log_level: WARNING # optional: set log level. Default WARNING
+          dockerfile_path: ${{ format('{0}/Dockerfile', env.DOCKERFILE_PATH) }} # path to the Dockerfile
+          output_file_path: console,results.sarif
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        if: always() # always run even if the previous step fails
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sarif_file: results.sarif
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.20.0
+        env:
+          TRIVY_USERNAME: ${{ env.REGISTRY_USERNAME }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          image-ref: "${{ env.REGISTRY_PATH }}:${{ env.DOCKERFILE_TAG }}"
+          format: 'sarif'
+          output: trivy-results.sarif
+          severity: 'HIGH,CRITICAL'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always() # always run even if the previous step fails
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Move cache
+        if: always() # always run even if the previous step fails
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
