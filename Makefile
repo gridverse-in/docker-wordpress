@@ -1,7 +1,7 @@
 export DOCKER_ORG ?= gridverse-in
 export DOCKER_TAG ?= latest
 export ECR_IMAGE ?= wordpress
-export DOCKER_IMAGE ?= gcr.io/$(DOCKER_ORG)/$(ECR_IMAGE)
+export DOCKER_IMAGE ?= ghcr.io/$(DOCKER_ORG)/$(ECR_IMAGE)
 export DOCKER_IMAGE_NAME ?= $(DOCKER_IMAGE):$(DOCKER_TAG)
 
 

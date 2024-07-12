@@ -17,8 +17,8 @@ on:
 env:
   DOCKERFILE_PATH: "."
   DOCKERFILE_TAG: ${{ github.event.pull_request.head.sha }}
-  REGISTRY_PATH: gcr.io/gridverse-in/wordpress
-  REGISTRY_TYPE: "gcr.io" # If not set then will default to Docker Hub
+  REGISTRY_PATH: ghcr.io/gridverse-in/wordpress
+  REGISTRY_TYPE: "ghcr.io" # If not set then will default to Docker Hub
   REGISTRY_USERNAME: ${{ github.actor }}
 
 jobs:
