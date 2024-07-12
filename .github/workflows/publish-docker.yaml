@@ -40,7 +40,7 @@ jobs:
             ghcr.io/gridverse-in/wordpress
           flavor: |
             latest=auto
-            suffix=${{matrix.file == 'DockerFile.xdebug' && 'xdebug' || ''}},onlatest=true
+            suffix=${{matrix.file == 'DockerFile.xdebug' && '-xdebug' || ''}},onlatest=true
           tags: |
             type=ref,event=branch
             type=ref,event=pr

@@ -7,10 +7,6 @@ FROM wordpress:${WORDPRESS_VERSION}-php${PHP_VERSION}-apache
 
 ARG WP_CLI_VERSION=2.10.0
 
-# Install wp-cli
-RUN curl -o /usr/local/bin/wp -OfL "https://github.com/wp-cli/wp-cli/releases/download/v${WP_CLI_VERSION}/wp-cli-${WP_CLI_VERSION}.phar" \
-    && chmod +x /usr/local/bin/wp
-
 # Install necessary utilities
 RUN <<EOF
     apt-get update
@@ -20,6 +16,9 @@ RUN <<EOF
 
     curl -o /usr/local/bin/yq -Ofl https://github.com/mikefarah/yq/releases/download/v4.44.2/yq_linux_386
     chmod a+x /usr/local/bin/yq
+
+    curl -o /usr/local/bin/wp -OfL "https://github.com/wp-cli/wp-cli/releases/download/v${WP_CLI_VERSION}/wp-cli-${WP_CLI_VERSION}.phar" \
+    && chmod +x /usr/local/bin/wp
 EOF
 
 
