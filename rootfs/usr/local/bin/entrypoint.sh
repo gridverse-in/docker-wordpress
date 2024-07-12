@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 set -e
 
 # Function to convert bytes to megabytes

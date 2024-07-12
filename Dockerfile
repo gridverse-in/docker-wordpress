@@ -12,14 +12,15 @@ RUN curl -o /usr/local/bin/wp -OfL "https://github.com/wp-cli/wp-cli/releases/do
     && chmod +x /usr/local/bin/wp
 
 # Install necessary utilities
-RUN apt-get update &&\
-	apt-get install -y \
-      jq && \
- 	apt-get clean && \
+RUN <<EOF
+    apt-get update
+	apt-get install -y jq gettext-base
+ 	apt-get clean
     rm -rf /var/lib/apt/lists/*
 
-RUN wget https://github.com/mikefarah/yq/releases/download/v4.44.2/yq_linux_386 -O /usr/local/bin/yq && \
+    curl -o /usr/local/bin/yq -Ofl https://github.com/mikefarah/yq/releases/download/v4.44.2/yq_linux_386
     chmod a+x /usr/local/bin/yq
+EOF
 
 
 COPY rootfs/ /
