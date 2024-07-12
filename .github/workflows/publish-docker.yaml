@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        file: [DockerFile, DockerFile.xdebug]
+        file: [Dockerfile, Dockerfile.xdebug]
         platform: [linux/amd64, linux/arm64]
     permissions:
       packages: write
