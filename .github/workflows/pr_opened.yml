@@ -5,8 +5,15 @@ on:
     branches:
       - 'main'
     paths:
-      - components/**
+      - Dockerfile
+      - 'Dockerfile.**'
 
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch or tag'
+        required: true
+        default: 'main'
 env:
   DOCKERFILE_PATH: "."
   DOCKERFILE_TAG: ${{ github.event.pull_request.head.sha }}
