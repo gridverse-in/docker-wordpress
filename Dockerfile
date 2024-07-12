@@ -12,28 +12,25 @@ ARG WP_CLI_VERSION=2.10.0
 ARG YQ_VERSION=4.44.2
 
 # Install necessary utilities
-RUN <<EOF
-    apt-get update
-	apt-get install -y jq gettext-base
- 	apt-get clean
+RUN apt-get update &&\
+    apt-get install -y \
+        jq \
+        gettext-base &&\
+    apt-get clean &&\
     rm -rf /var/lib/apt/lists/*
-EOF
 
-RUN <<EOF
+RUN \
     case "$TARGETPLATFORM" in \
-      "linux/amd64") YQ_URL="https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64" ;;
-      "linux/arm64") YQ_URL="https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_arm64" ;;
-      *) echo "Unsupported architecture: ${TARGETPLATFORM}" && exit 1 ;;
-    esac
-
-    curl -o /usr/local/bin/yq -OfL "${YQ_URL}"
+      "linux/amd64") YQ_URL="https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64" ;; \
+      "linux/arm64") YQ_URL="https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_arm64" ;; \
+      *) echo "Unsupported architecture: ${TARGETPLATFORM}" && exit 1 ;; \
+    esac &&\
+    curl -o /usr/local/bin/yq -OfL "${YQ_URL}" &&\
     chmod a+x /usr/local/bin/yq
-EOF
 
-RUN <<EOF
-    curl -o /usr/local/bin/wp -OfL "https://github.com/wp-cli/wp-cli/releases/download/v${WP_CLI_VERSION}/wp-cli-${WP_CLI_VERSION}.phar"
+
+RUN curl -o /usr/local/bin/wp -OfL "https://github.com/wp-cli/wp-cli/releases/download/v${WP_CLI_VERSION}/wp-cli-${WP_CLI_VERSION}.phar" &&\
     chmod +x /usr/local/bin/wp
-EOF
 
 
 COPY rootfs/ /
