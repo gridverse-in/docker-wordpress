@@ -8,10 +8,6 @@ jobs:
   build:
     name: Build and Push Docker images
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        file: [Dockerfile, Dockerfile.xdebug]
-        platform: [linux/amd64, linux/arm64]
     permissions:
       packages: write
       contents: read
@@ -35,22 +31,41 @@ jobs:
         with:
           images: |
             ghcr.io/gridverse-in/wordpress
-          flavor: |
-            latest=auto
-            suffix=${{matrix.file == 'DockerFile.xdebug' && '-xdebug' || ''}},onlatest=true
           tags: |
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta-xdebug
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/gridverse-in/wordpress
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}-xdebug
+            type=semver,pattern={{major}}.{{minor}}-xdebug
 
       - name: Build and push Docker images
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ${{ matrix.file }}
-          platforms: ${{ matrix.platform }}
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+
+      - name: Build and push Docker images with xdebug
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.xdebug
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-xdebug.outputs.tags }}
+          labels: ${{ steps.meta-xdebug.outputs.labels }}
+          annotations: ${{ steps.meta-xdebug.outputs.annotations }}
