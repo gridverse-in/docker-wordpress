@@ -63,7 +63,7 @@ RUN apt-get update &&\
     make &&\
     make install &&\
     rm -rf /tmp/xdebug &&\
-    apt-get uninstall -y git &&\
+    apt-get remove -y git &&\
     apt-get clean &&\
     rm -rf /var/lib/apt/lists/*
 
