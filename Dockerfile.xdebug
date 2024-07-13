@@ -35,6 +35,8 @@ RUN curl -o /usr/local/bin/wp -OfL "https://github.com/wp-cli/wp-cli/releases/do
 
 COPY rootfs/ /
 
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Set the environment variables for PHP configuration
 ENV PHP_UPLOAD_MAX_FILESIZE 20M
 ENV PHP_POST_MAX_SIZE 10M
