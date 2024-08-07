@@ -16,9 +16,19 @@ RUN apt-get update &&\
     apt-get install -y \
         jq \
         gettext-base \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libpng-dev \
+        libwebp-dev \
+        libxpm-dev \
+        less \
+        wget \
+        unzip \
         default-mysql-client &&\
     apt-get clean &&\
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* &&\
+    docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp --with-xpm &&\
+    docker-php-ext-install -j$(nproc) gd
 
 RUN \
     case "$TARGETPLATFORM" in \
@@ -33,12 +43,8 @@ RUN \
 RUN curl -o /usr/local/bin/wp -OfL "https://github.com/wp-cli/wp-cli/releases/download/v${WP_CLI_VERSION}/wp-cli-${WP_CLI_VERSION}.phar" &&\
     chmod +x /usr/local/bin/wp
 
-# Install mysql client
-RUN apt-get update && apt-get install -y default-mysql-client && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY rootfs/ /
-
-RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set the environment variables for PHP configuration
 ENV PHP_UPLOAD_MAX_FILESIZE=20M
