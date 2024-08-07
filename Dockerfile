@@ -47,7 +47,7 @@ RUN cp -a /usr/src/wordpress/. /var/www/html && \
     rm -rf /var/www/html/wp-content/plugins/* && \
     rm -rf /var/www/html/wp-content/themes/* && \
     mkdir /var/www/html/wp-content/uploads && \
-    chown -R www-data:www-data /var/www/html/wp-content/uploads
+    chown -R www-data:www-data /var/www/html/wp-content
 
 COPY rootfs/ /
 
