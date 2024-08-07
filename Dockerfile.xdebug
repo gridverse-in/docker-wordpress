@@ -46,7 +46,8 @@ RUN curl -o /usr/local/bin/wp -OfL "https://github.com/wp-cli/wp-cli/releases/do
 RUN cp -a /usr/src/wordpress/. /var/www/html && \
     rm -rf /var/www/html/wp-content/plugins/* && \
     rm -rf /var/www/html/wp-content/themes/* && \
-    mkdir /var/www/html/wp-content/uploads
+    mkdir /var/www/html/wp-content/uploads && \
+    chown -R www-data:www-data /var/www/html/wp-content/uploads
 
 COPY rootfs/ /
 
