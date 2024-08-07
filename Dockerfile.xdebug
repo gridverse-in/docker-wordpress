@@ -43,6 +43,10 @@ RUN \
 RUN curl -o /usr/local/bin/wp -OfL "https://github.com/wp-cli/wp-cli/releases/download/v${WP_CLI_VERSION}/wp-cli-${WP_CLI_VERSION}.phar" &&\
     chmod +x /usr/local/bin/wp
 
+RUN cp -a /usr/src/wordpress/. /var/www/html && \
+    rm -rf /var/www/html/wp-content/plugins/* && \
+    rm -rf /var/www/html/wp-content/themes/* && \
+    mkdir /var/www/html/wp-content/uploads
 
 COPY rootfs/ /
 
