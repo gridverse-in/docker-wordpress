@@ -13,22 +13,63 @@ ARG YQ_VERSION=4.44.2
 
 # Install necessary utilities
 RUN apt-get update &&\
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
         jq \
+        ghostscript \
         gettext-base \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
-        libpng-dev \
-        libwebp-dev \
-        libxpm-dev \
         less \
         wget \
         unzip \
-        default-mysql-client &&\
+        default-mysql-client &&\        
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libmagickwand-dev \
+        libpng-dev \
+        libwebp-dev \
+        libxpm-dev \
+        libzip-dev \
+    && \
     apt-get clean &&\
     rm -rf /var/lib/apt/lists/* &&\
     docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp --with-xpm &&\
-    docker-php-ext-install -j$(nproc) gd
+    docker-php-ext-install -j$(nproc) \
+        bcmath \
+		exif \
+		gd \
+		mysqli \
+		zip \
+    ; \
+    pecl install imagick-3.7.0; \
+	docker-php-ext-enable imagick; \
+    rm -r /tmp/pear; \
+	\
+# some misbehaving extensions end up outputting to stdout 🙈 (https://github.com/docker-library/wordpress/issues/669#issuecomment-993945967)
+	out="$(php -r 'exit(0);')"; \
+	[ -z "$out" ]; \
+	err="$(php -r 'exit(0);' 3>&1 1>&2 2>&3)"; \
+	[ -z "$err" ]; \
+	\
+	extDir="$(php -r 'echo ini_get("extension_dir");')"; \
+	[ -d "$extDir" ]; \
+# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
+    savedAptMark="$(apt-mark showmanual)"; \
+	apt-mark auto '.*' > /dev/null; \
+	apt-mark manual $savedAptMark; \
+	ldd "$extDir"/*.so \
+		| awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); printf "*%s\n", so }' \
+		| sort -u \
+		| xargs -r dpkg-query --search \
+		| cut -d: -f1 \
+		| sort -u \
+		| xargs -rt apt-mark manual; \
+	\
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	rm -rf /var/lib/apt/lists/*; \
+	\
+	! { ldd "$extDir"/*.so | grep 'not found'; }; \
+# check for output like "PHP Warning:  PHP Startup: Unable to load dynamic library 'foo' (tried: ...)
+	err="$(php --version 3>&1 1>&2 2>&3)"; \
+	[ -z "$err" ]
 
 RUN \
     case "$TARGETPLATFORM" in \
@@ -62,7 +103,6 @@ ENTRYPOINT ["entrypoint.sh"]
 
 # Start the container
 CMD ["apache2-foreground"]
-
 
 # Install XDebug from source as described here:
 # https://xdebug.org/docs/install
